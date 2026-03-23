@@ -1,14 +1,56 @@
-import express from 'express';
+import { eq } from 'drizzle-orm';
+// @ts-ignore - 'pool' might not exist for neon-http but we'll handle it gracefully
+import { index, pool } from './db';
+import { demoUsers } from './db/schema/index';
 
-const app = express();
-const PORT = 8000;
+async function main() {
+  try {
+    console.log('Performing CRUD operations...');
 
-app.use(express.json());
+    // CREATE: Insert a new user
+    const [newUser] = await index
+      .insert(demoUsers)
+      .values({ name: 'Admin User', email: `admin-${Date.now()}@example.com` })
+      .returning();
 
-app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to the University Dashboard API' });
-});
+    if (!newUser) {
+      throw new Error('Failed to create user');
+    }
+    
+    console.log('✅ CREATE: New user created:', newUser);
 
-app.listen(PORT, () => {
-  console.log(`Server is running at http://localhost:${PORT}`);
-});
+    // READ: Select the user
+    const foundUser = await index.select().from(demoUsers).where(eq(demoUsers.id, newUser.id));
+    console.log('✅ READ: Found user:', foundUser[0]);
+
+    // UPDATE: Change the user's name
+    const [updatedUser] = await index
+      .update(demoUsers)
+      .set({ name: 'Super Admin' })
+      .where(eq(demoUsers.id, newUser.id))
+      .returning();
+    
+    if (!updatedUser) {
+      throw new Error('Failed to update user');
+    }
+    
+    console.log('✅ UPDATE: User updated:', updatedUser);
+
+    // DELETE: Remove the user
+    await index.delete(demoUsers).where(eq(demoUsers.id, newUser.id));
+    console.log('✅ DELETE: User deleted.');
+
+    console.log('\nCRUD operations completed successfully.');
+  } catch (error) {
+    console.error('❌ Error performing CRUD operations:', error);
+    process.exit(1);
+  } finally {
+    // If the pool exists, end it to close the connection
+    if (typeof pool !== 'undefined' && pool && typeof pool.end === 'function') {
+      await pool.end();
+      console.log('Database pool closed.');
+    }
+  }
+}
+
+main();
