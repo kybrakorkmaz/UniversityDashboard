@@ -9,8 +9,10 @@ router.get("/", async (req, res)=>{
     try{
         const {search, department, page=1, limit=10}= req.query;
 
-        const currentPage = Math.max(1, +page);
-        const limitPerPage = Math.max(1, +limit);
+        const parsedPage = parseInt(String(page), 10);
+        const parsedLimit = parseInt(String(limit), 10);
+        const currentPage = Number.isNaN(parsedPage) ? 1 : Math.max(1, parsedPage);
+        const limitPerPage = Number.isNaN(parsedLimit) ? 10 : Math.max(1, parsedLimit);
 
         const offset = (currentPage-1)*limitPerPage;
 
@@ -20,14 +22,14 @@ router.get("/", async (req, res)=>{
         if(search){
             filterConditions.push(
                 or(
-                    ilike(subjects.name, `${search}`),
-                    ilike(subjects.code, `${search}`)
+                    ilike(subjects.name, `%${search}%`),
+                    ilike(subjects.code, `%${search}%`)
                 )
             );
         }
         // If department filter exists, match department name
         if(department){
-            filterConditions.push(ilike(departments.name, `${department}`));
+            filterConditions.push(ilike(departments.name, `%${department}%`));
         }
 
         // Combine all filters using AND if any exist
