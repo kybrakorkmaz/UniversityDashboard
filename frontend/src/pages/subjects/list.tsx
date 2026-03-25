@@ -11,7 +11,6 @@ import {useTable} from "@refinedev/react-table";
 import {Subject} from "@/types";
 import {ColumnDef} from "@tanstack/react-table";
 import {Badge} from "@/components/ui/badge.tsx";
-import {getDayClassNames} from "react-day-picker/src/hooks/useDayRender/utils/getDayClassNames.ts";
 
 const SubjectsList = ()=>{
     const [searchQuery, setSearchQuery] = useState('');
@@ -27,7 +26,8 @@ const SubjectsList = ()=>{
     ]:[];
 
     const subjectTable = useTable<Subject>({
-        columns: useMemo<ColumnDef<Subject>[]>(()=>[
+        columns: useMemo<ColumnDef<Subject>[]>(
+            ()=>[
             {
                 id: 'code',
                 accessorKey: 'code',
@@ -40,25 +40,25 @@ const SubjectsList = ()=>{
                 accessorKey: 'name',
                 size: 200,
                 header: ()=> <p className={"column-title"}>Name</p>,
-                cell: ({getValue})=><span
-                className={"text-foreground"}>{getValue<string>()}</span>,
+                cell: ({getValue})=>(
+                    <span className={"text-foreground"}>{getValue<string>()}</span>),
                 filterFn: 'includesString'
             },
             {
                 id: 'department',
-                accessorKey: 'department',
+                accessorKey: 'department.name',
                 size: 150,
                 header: ()=><p className={"column-title"}>Department</p>,
-                cell: ({getValue})=><Badge
-                variant={"secondary"}>{getValue<string>()}</Badge>,
+                cell: ({getValue})=>(
+                    <Badge variant={"secondary"}>{getValue<string>()}</Badge>),
             },
             {
                 id: 'description',
                 accessorKey: 'description',
                 size: 300,
                 header: () => <p className={"column-title"}>Description</p>,
-                cell: ({getValue}) => <span
-                className={"truncate line-clamp-2"}>{getValue<string>()}</span>,
+                cell: ({getValue}) =>
+                    (<span className={"truncate line-clamp-2"}>{getValue<string>()}</span>),
             }
         ], []),
         refineCoreProps:{
