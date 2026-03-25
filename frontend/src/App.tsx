@@ -18,6 +18,7 @@ import SubjectsList from "@/pages/subjects/list.tsx";
 import SubjectCreate from "@/pages/subjects/create.tsx";
 import {dataProvider} from "@/providers/data.ts";
 
+
 function App() {
   return (
     <BrowserRouter>

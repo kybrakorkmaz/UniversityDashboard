@@ -1,7 +1,7 @@
 import express from "express";
 import {and, desc, eq, getTableColumns, ilike, or, sql} from "drizzle-orm";
-import {departments, subjects} from "../db/schema";
-import {db} from "../db";
+import {departments, subjects} from "../db/schema/app";
+import {db} from "../db/index";
 
 const router = express.Router();
 
@@ -39,7 +39,7 @@ router.get("/", async (req, res)=>{
             .from(subjects)
             .leftJoin(departments, eq(subjects.departmentId, departments.id))
             .where(whereClause);
-        const totalCount = Number(countResult[0]?.count) || 0;
+        const totalCount = countResult[0]?.count ?? 0;
         const subjectList = await db.select({
             ...getTableColumns(subjects),
             department: {...getTableColumns(departments)}
@@ -50,6 +50,7 @@ router.get("/", async (req, res)=>{
             .offset(offset);
         res.status(200).json({
             data: subjectList,
+            total: totalCount,
             pagination: {
                 page: currentPage,
                 limit: limitPerPage,
