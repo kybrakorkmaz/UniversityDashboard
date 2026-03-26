@@ -1,4 +1,4 @@
-import {integer, pgTable, time, timestamp, varchar} from "drizzle-orm/pg-core";
+import {index, integer, jsonb, pgTable, text, time, timestamp, varchar} from "drizzle-orm/pg-core";
 import {relations} from "drizzle-orm";
 
 const timestamps = {
@@ -21,13 +21,6 @@ export const subjects = pgTable('subjects', {
     ...timestamps
 })
 
-export const departmentRelations = relations(departments, ({many})=>({subjects: many(subjects)}));
-export const subjectRelations = relations(subjects, ({one, many})=>({
-    department: one(departments, {
-        fields: [subjects.departmentId],
-        references: [departments.id],
-    })
-}));
 
 export type Department = typeof departments.$inferSelect;
 export type NewDepartment = typeof  departments.$inferInsert;
