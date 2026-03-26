@@ -4,7 +4,8 @@ import {useBack} from "@refinedev/core";
 import {Separator} from "@/components/ui/separator.tsx";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod"
-import {Controller, useForm} from "react-hook-form"
+import {Controller} from "react-hook-form"
+import { useForm } from "@refinedev/react-hook-form";
 import {classSchema} from "@/lib/schema.ts";
 import { Button } from "@/components/ui/button"
 import {
@@ -44,14 +45,11 @@ const Create = ()=>{
     const {
         handleSubmit,
         formState: {isSubmitting, errors},
-        control
+        control,
+        refineCore: { onFinish }
     }= form;
     const onSubmit=(values: z.infer<typeof classSchema>) =>{
-        try{
-            console.log(values);
-        }catch (e) {
-            console.log('Error creating new classes', e);
-        }
+        return onFinish(values);
     };
 
 
@@ -116,7 +114,7 @@ const Create = ()=>{
                                                 field.value, publicId:
                                                 bannerPublicId ?? ''
                                             }: null}
-                                            onChange={(file: any, field: any) =>setBannerImage(file, field)}
+                                            onChange={(file: any) => setBannerImage(file, field)}
                                         />
                                     </FormControl>
                                     <FormMessage/>

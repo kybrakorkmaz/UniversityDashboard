@@ -3,13 +3,13 @@ import {UploadWidgetValue} from "@/types";
 import {UploadCloud} from "lucide-react";
 import {useExport} from "@refinedev/core";
 import {CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET} from "@/constants";
-import {callbackify} from "node:util";
+
 
 const UploadWidget = ({value=null, onChange, disabled=false})=>{
     const widgetRef = useRef<CloudinaryWidget | null>(null);
     const onChangeRef = useRef(onChange);
     const[preview, setPreview]=useState<UploadWidgetValue | null>(value);
-
+    const[deleteToken, setDeleteToken]=useState<string | null>(null);
     useEffect(()=>{
         setPreview(value);
     }, [value]);
@@ -65,9 +65,11 @@ const UploadWidget = ({value=null, onChange, disabled=false})=>{
                     <img src={preview.url} alt="Uploaded file"/>
                 </div>
             ):<div className={"upload-dropzone"} role={"button"} tabIndex={0}
-                onClick={openWidget} onKeyDown={(event)=>{
-                    event.preventDefault();
-                    openWidget();
+                onClick={openWidget} onKeyDown={(event) => {
+                   if (event.key === 'Enter' || event.key === ' ') {
+                       event.preventDefault();
+                       openWidget();
+                   }
                 }}
             >
                 <div className={"upload-prompt"}>
