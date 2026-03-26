@@ -17,7 +17,8 @@ app.use(cors({
     credentials: true
 }))
 app.use(express.json());
-
+// TODO: Register authentication middleware here (e.g., Better Auth or custom auth)
+// securityMiddleware is moved here so it can read req.user from auth middleware
 app.use(securityMiddleware);
 
 app.use('/api/subjects', subjectsRouter);
