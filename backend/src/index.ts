@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from "express";
 import subjectsRouter from "./routes/subjects"
 import cors from "cors";
+import securityMiddleware from "./middleware/security";
 
 
 const app = express();
@@ -16,6 +17,8 @@ app.use(cors({
     credentials: true
 }))
 app.use(express.json());
+
+app.use(securityMiddleware);
 
 app.use('/api/subjects', subjectsRouter);
 app.use('/', (req, res)=>{
