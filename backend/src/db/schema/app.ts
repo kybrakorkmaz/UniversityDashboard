@@ -90,11 +90,6 @@ export const enrollmentsRelations = relations(enrollments, ({one}) => ({
     })
 }))
 
-export const userRelations = relations(user, ({many}) => ({
-    classes: many(classes),
-    enrollments: many(enrollments)
-}))
-
 export type Department = typeof departments.$inferSelect;
 export type NewDepartment = typeof departments.$inferInsert;
 
