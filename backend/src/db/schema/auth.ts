@@ -6,14 +6,14 @@ export const roleEnum = pgEnum('role', ['student', 'teacher', 'admin']);
 
 const timestamps = {
 	createdAt: timestamp('created_at').defaultNow().notNull(),
-	updatedAt: timestamp('updated_at').defaultNow().$onUpdate(()=>new Date()).notNull()
+	updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()).notNull()
 }
 
 export const user = pgTable("user", {
-	id: text("id").primaryKey(),
+	id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
 	name: text('name').notNull(),
 	email: text('email').notNull().unique(),
-	emailVerified: boolean('email_verified').notNull(),
+	emailVerified: boolean('email_verified').default(false).notNull(),
 	image: text('image'),
 	...timestamps,
 	role: roleEnum("role").default("student").notNull(),

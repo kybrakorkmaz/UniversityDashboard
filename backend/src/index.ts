@@ -3,6 +3,8 @@ import express from "express";
 import subjectsRouter from "./routes/subjects"
 import cors from "cors";
 import securityMiddleware from "./middleware/security";
+import {toNodeHandler} from "better-auth/node";
+import {auth} from "./lib/auth";
 
 
 const app = express();
@@ -15,7 +17,9 @@ app.use(cors({
     origin: process.env.FRONTEND_URL || false, // false disables CORS if not configured
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
-}))
+}));
+
+app.all('/api/auth/*splat', toNodeHandler(auth));
 app.use(express.json());
 // Add authentication middleware here so it can populate req.user for securityMiddleware
 // app.use(authMiddleware); 
