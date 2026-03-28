@@ -14,7 +14,7 @@ const buildHttpError = async (response: Response):Promise<HttpError>=>{
         // ignore errors
     }
     return{
-        message,
+        message: `${message} (Status: ${response.status})`,
         statusCode: response.status
     }
 }
