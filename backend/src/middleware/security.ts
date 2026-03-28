@@ -3,7 +3,12 @@ import {slidingWindow} from "@arcjet/node";
 import aj from  "../config/arcjet.js";
 import { isSpoofedBot } from "@arcjet/inspect";
 const securityMiddleware = async(req: Request, res: Response, next: NextFunction)=>{
-    if(process.env.NODE_ENV==='test') return next();
+    const isDev = process.env.NODE_ENV !== "production";
+
+    if (isDev) {
+        console.log("Security middleware skipped (dev mode)");
+        return next();
+    }
     try{
         const role: RateLimitRole = req.user?.role ?? 'guest';
 
