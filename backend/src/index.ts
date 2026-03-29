@@ -22,19 +22,18 @@ const allowedOrigins = [
 
 app.use(cors({
     origin: (origin, callback) => {
-        // Eğer origin yoksa (Postman, curl vb) izin ver
-        if (!origin) return callback(null, true);
-
+        if (!origin) return callback(null, true); // Postman, curl vb.
         if (allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
-            callback(new Error(`CORS policy: ${origin} is not allowed`));
+            callback(null, false); // hata fırlatma yerine false dön
         }
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 app.all('/api/auth/*splat', toNodeHandler(auth));
 app.use(express.json());
 // Add authentication middleware here so it can populate req.user for securityMiddleware
