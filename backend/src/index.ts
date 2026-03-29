@@ -16,13 +16,25 @@ const PORT = 8000;
 if (!process.env.FRONTEND_URL) {
     console.warn('FRONTEND_URL is not set. CORS origin will be undefined.');
 }
-app.use(
-    cors({
-        origin: process.env.FRONTEND_URL, // React app URL
-        methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed HTTP methods
-        credentials: true, // allow cookies
-    })
-);
+const allowedOrigins = [
+    process.env.FRONTEND_URL
+];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        // Eğer origin yoksa (Postman, curl vb) izin ver
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error(`CORS policy: ${origin} is not allowed`));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.all('/api/auth/*splat', toNodeHandler(auth));
 app.use(express.json());
 // Add authentication middleware here so it can populate req.user for securityMiddleware
