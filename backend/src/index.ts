@@ -13,6 +13,10 @@ import {auth} from "./lib/auth.js";
 
 const app = express();
 const PORT = 8000;
+
+// close ETag
+app.disable("etag");
+
 if (!process.env.FRONTEND_URL) {
     console.warn('FRONTEND_URL is not set. CORS origin will be undefined.');
 }
