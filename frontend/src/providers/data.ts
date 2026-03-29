@@ -1,13 +1,18 @@
-import {createDataProvider, CreateDataProviderOptions} from "@refinedev/rest";
-import {CreateResponse, ListResponse} from "@/types";
-import {BACKEND_BASE_URL} from "@/constants";
-import {HttpError} from "@refinedev/core";
+import { createDataProvider, CreateDataProviderOptions } from "@refinedev/rest";
+import { HttpError } from "@refinedev/core";
+import { BACKEND_BASE_URL } from "@/constants";
+import { CreateResponse, ListResponse } from "@/types";
 
 const buildHttpError = async (response: Response): Promise<HttpError> => {
     let message = "Request failed.";
     try {
-        const payload = await response.json();
-        if (payload?.message) message = payload.message;
+        const payloadText = await response.text(); // sadece text al
+        try {
+            const payload = JSON.parse(payloadText);
+            if (payload?.message) message = payload.message;
+        } catch {
+            if (payloadText) message = payloadText;
+        }
     } catch {
         // ignore parse errors
     }
@@ -51,7 +56,6 @@ const options: CreateDataProviderOptions = {
         getTotalCount: async (response) => {
             const payload: ListResponse =
                 (response as any)._parsedPayload ?? (await response.json());
-            // prefer pagination.total, fallback to root total
             return (
                 payload.pagination?.total ??
                 payload.total ??
@@ -72,6 +76,6 @@ const options: CreateDataProviderOptions = {
     },
 };
 
-const {dataProvider} = createDataProvider(BACKEND_BASE_URL, options);
+const { dataProvider } = createDataProvider(BACKEND_BASE_URL, options);
 
-export {dataProvider};
+export { dataProvider };
