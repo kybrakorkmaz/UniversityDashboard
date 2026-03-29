@@ -21,17 +21,8 @@ const allowedOrigins = [
 ];
 
 app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin) return callback(null, true); // Postman, curl vb.
-        if (allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(null, false); // hata fırlatma yerine false dön
-        }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    origin: '*',
+    credentials: true
 }));
 
 app.all('/api/auth/*splat', toNodeHandler(auth));
