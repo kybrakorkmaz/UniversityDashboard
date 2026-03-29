@@ -35,9 +35,10 @@ app.use('/api/subjects', subjectsRouter);
 app.use("/api/users", usersRouter);
 app.use('/api/classes', classesRouter);
 
-app.use('/', (req, res)=>{
-    res.send('Hello, welcome to API')
-})
+app.use('/', (req, res) => {
+    res.json({ message: 'Hello, welcome to API' });
+});
+
 
 app.listen(PORT, ()=>{
     console.log(`Server is running at http://localhost:${PORT}`);

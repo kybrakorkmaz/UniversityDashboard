@@ -63,6 +63,7 @@ const SubjectsList = ()=>{
         ], []),
         refineCoreProps:{
             resource: 'subjects',
+            meta: { apiUrl: '/api' },
             pagination: {pageSize: 10, mode: 'server'},
             filters: {
                 permanent: [ ... departmentFilters, ...searchFilters]
