@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1774512107626,
-      "tag": "0000_initial_schema",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1774679982721,
-      "tag": "0001_petite_adam_destine",
+      "when": 1774981081167,
+      "tag": "0000_cute_stellaris",
       "breakpoints": true
     }
   ]
