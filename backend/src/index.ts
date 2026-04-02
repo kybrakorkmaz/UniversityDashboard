@@ -19,14 +19,39 @@ app.disable("etag");
 if (!process.env.FRONTEND_URL) {
     console.warn('FRONTEND_URL is not set. CORS origin will be undefined.');
 }
-const allowedOrigins = [
-    process.env.FRONTEND_URL
-];
+const allowedOrigin = process.env.FRONTEND_URL;
+const allowedDomain = process.env.FRONTEND_DOMAIN;
 
-app.use(cors({
-    origin: '*',
-    credentials: true
-}));
+const corsOptions = {
+    origin: (origin: string | undefined, callback: Function) => {
+
+        if (!origin) return callback(null, true);
+
+        if (origin.includes("localhost")) {
+            return callback(null, true);
+        }
+
+        if (origin === allowedOrigin) {
+            return callback(null, true);
+        }
+
+        if (allowedDomain && origin.endsWith(`.${allowedDomain}`)) {
+            return callback(null, true);
+        }
+
+        console.warn("Blocked by CORS:", origin);
+        return callback(null, false);
+    },
+
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+// ✅ hem normal request hem preflight aynı config
+app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions)); // 🔥 BURASI FIX
+
 
 app.all('/api/auth/*splat', toNodeHandler(auth));
 app.use(express.json());

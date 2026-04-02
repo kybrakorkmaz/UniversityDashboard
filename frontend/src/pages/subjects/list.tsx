@@ -14,16 +14,23 @@ import {Badge} from "@/components/ui/badge.tsx";
 
 const SubjectsList = ()=>{
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedDepartment, setSelectedDepartment] = useState('all');
+    const [selectedDepartment, setSelectedDepartment] = useState<string>('all');
 
-    const departmentFilters= selectedDepartment === 'all' ? [] : [
-        {field: 'department',
-        operator: 'eq' as const,
-        value: selectedDepartment}
+    const departmentFilters=
+        selectedDepartment === 'all' ? [] : [
+        {
+            field: 'department',
+            operator: 'eq' as const,
+            value: selectedDepartment
+        }
     ];
     const searchFilters = searchQuery ? [
-        {field: 'name', operator: 'contains' as const, value: searchQuery}
-    ]:[];
+        {
+            field: 'name',
+            operator: 'contains' as const,
+            value: searchQuery
+        }]
+        : [];
 
     const subjectTable = useTable<Subject>({
         columns: useMemo<ColumnDef<Subject>[]>(
@@ -63,13 +70,20 @@ const SubjectsList = ()=>{
         ], []),
         refineCoreProps:{
             resource: 'subjects',
-            pagination: {pageSize: 10, mode: 'server'},
+            pagination: {
+                pageSize: 10,
+                mode: 'server'
+            },
             filters: {
+                // Compose refine filters from the current UI selections.
                 permanent: [ ... departmentFilters, ...searchFilters]
             },
             sorters: {
                 initial:[
-                    {field:'id', order:'desc'}
+                    {
+                        field:'id',
+                        order:'desc'
+                    }
                 ]
             },
         }
@@ -96,21 +110,22 @@ const SubjectsList = ()=>{
                             value={selectedDepartment}
                             onValueChange={setSelectedDepartment}
                         >
-                            <SelectTrigger>
+                            <SelectTrigger className={""}>
                                 <SelectValue placeholder={"Filter by department"}/>
                             </SelectTrigger>
 
                             <SelectContent>
                                 <SelectItem value={"all"}>All Departments</SelectItem>
                                 {DEPARTMENT_OPTIONS.map((department)=>(
-                                    <SelectItem key={department.value}
-                                    value={department.value}>
+                                    <SelectItem
+                                        key={department.value}
+                                        value={department.value}>
                                         {department.label}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
-                        <CreateButton/>
+                        <CreateButton resource={"subjects"}/>
                     </div>
                 </div>
             </div>
