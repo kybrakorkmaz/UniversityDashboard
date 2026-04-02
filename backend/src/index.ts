@@ -23,29 +23,17 @@ const allowedOrigin = process.env.FRONTEND_URL;
 const allowedDomain = process.env.FRONTEND_DOMAIN;
 
 const corsOptions = {
-    origin: (origin: string | undefined, callback: Function) => {
-        if (!origin) return callback(null, true);
-        let parsedOrigin: URL;
-        try {
-            parsedOrigin = new URL(origin);
-        } catch {
-            console.warn("Blocked malformed origin:", origin);
-            return callback(null, false);
-        }
-        const { hostname, origin: normalizedOrigin } = parsedOrigin;
-        if (hostname === "localhost" || hostname.endsWith(".localhost")) {
+    origin: (origin, callback) => {
+        if (!origin || origin.includes("localhost")) {
             return callback(null, true);
         }
-        if (normalizedOrigin === allowedOrigin) {
+
+        const frontendUrl = process.env.FRONTEND_URL?.trim();
+        if (origin === frontendUrl) {
             return callback(null, true);
         }
-        if (
-            allowedDomain &&
-            (hostname === allowedDomain || hostname.endsWith(`.${allowedDomain}`))
-        ) {
-            return callback(null, true);
-        }
-        console.warn("Blocked by CORS:", origin);
+
+        console.warn("Blocked by CORS. Origin:", origin, "Expected:", frontendUrl);
         return callback(null, false);
     },
     credentials: true,
@@ -53,9 +41,8 @@ const corsOptions = {
     allowedHeaders: ["Content-Type", "Authorization"],
 };
 
-// ✅ hem normal request hem preflight aynı config
 app.use(cors(corsOptions));
-app.options(/.*/, cors(corsOptions)); // 🔥 BURASI FIX
+app.options(/.*/, cors(corsOptions));
 
 
 app.all('/api/auth/*splat', toNodeHandler(auth));
