@@ -24,25 +24,30 @@ const allowedDomain = process.env.FRONTEND_DOMAIN;
 
 const corsOptions = {
     origin: (origin: string | undefined, callback: Function) => {
-
         if (!origin) return callback(null, true);
-
-        if (origin.includes("localhost")) {
+        let parsedOrigin: URL;
+        try {
+            parsedOrigin = new URL(origin);
+        } catch {
+            console.warn("Blocked malformed origin:", origin);
+            return callback(null, false);
+        }
+        const { hostname, origin: normalizedOrigin } = parsedOrigin;
+        if (hostname === "localhost" || hostname.endsWith(".localhost")) {
             return callback(null, true);
         }
-
-        if (origin === allowedOrigin) {
+        if (normalizedOrigin === allowedOrigin) {
             return callback(null, true);
         }
-
-        if (allowedDomain && origin.endsWith(`.${allowedDomain}`)) {
+        if (
+            allowedDomain &&
+            (hostname === allowedDomain || hostname.endsWith(`.${allowedDomain}`))
+        ) {
             return callback(null, true);
         }
-
         console.warn("Blocked by CORS:", origin);
         return callback(null, false);
     },
-
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
