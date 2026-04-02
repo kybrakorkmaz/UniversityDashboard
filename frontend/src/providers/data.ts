@@ -49,11 +49,13 @@ const options: CreateDataProviderOptions = {
         mapResponse: async (response) => {
             if (!response.ok) throw await buildHttpError(response);
             const payload: ListResponse = await response.json();
+            (response as any)._cachedPayload = payload;
             return payload.data ?? [];
         },
 
         getTotalCount: async (response) => {
-            const payload: ListResponse =await response.json();
+            const payload: ListResponse = (response as any)._cachedPayload;
+            if (!payload) return 0;
             return payload.pagination?.total ?? payload.data?.length ?? 0;
         },
     },
