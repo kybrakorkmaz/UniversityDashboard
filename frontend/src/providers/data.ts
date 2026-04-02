@@ -1,7 +1,8 @@
 import { createDataProvider, CreateDataProviderOptions } from "@refinedev/rest";
 import { HttpError } from "@refinedev/core";
 import { BACKEND_BASE_URL } from "@/constants";
-import { CreateResponse, ListResponse } from "@/types";
+import {CreateResponse, GetOneResponse, ListResponse} from "@/types";
+
 
 const buildHttpError = async (response: Response): Promise<HttpError> => {
     let message = "Request failed.";
@@ -13,8 +14,8 @@ const buildHttpError = async (response: Response): Promise<HttpError> => {
         } catch {
             if (payloadText) message = payloadText;
         }
-    } catch {
-        // ignore parse errors
+    } catch(error) {
+        console.error("error class", error);
     }
     return {
         message: `${message} (Status: ${response.status})`,
@@ -48,20 +49,14 @@ const options: CreateDataProviderOptions = {
         mapResponse: async (response) => {
             if (!response.ok) throw await buildHttpError(response);
             const payload: ListResponse = await response.json();
-            // cache parsed payload for getTotalCount
-            (response as any)._parsedPayload = payload;
+            (response as any)._cachedPayload = payload;
             return payload.data ?? [];
         },
 
         getTotalCount: async (response) => {
-            const payload: ListResponse =
-                (response as any)._parsedPayload ?? (await response.json());
-            return (
-                payload.pagination?.total ??
-                payload.total ??
-                payload.data?.length ??
-                0
-            );
+            const payload: ListResponse = (response as any)._cachedPayload;
+            if (!payload) return 0;
+            return payload.pagination?.total ?? payload.data?.length ?? 0;
         },
     },
 
@@ -72,6 +67,16 @@ const options: CreateDataProviderOptions = {
             if (!response.ok) throw await buildHttpError(response);
             const json: CreateResponse = await response.json();
             return json.data ?? [];
+        },
+    },
+
+    getOne: {
+        getEndpoint:({resource, id})=>`${resource}/${id}`,
+
+        mapResponse: async (response)=>{
+            if (!response.ok) throw await buildHttpError(response);
+            const json: GetOneResponse=await response.json();
+            return json.data??{};
         },
     },
 };
