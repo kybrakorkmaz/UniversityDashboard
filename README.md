@@ -1,5 +1,4 @@
-# UniversityDashboard
-# University Dashboard Project
+# University Dashboard
 
 This project is a web application designed to display and manage university courses and related data.
 
